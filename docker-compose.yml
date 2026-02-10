@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   niffler-all-db:
     container_name: niffler-all-db

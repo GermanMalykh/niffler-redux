@@ -1,6 +1,8 @@
 #!/bin/bash
+export PATH="/usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:$PATH"
 source ./docker.properties
 export PROFILE=docker
+DOCKER_COMPOSE="docker compose"
 
 echo '### Java version ###'
 java --version
@@ -16,7 +18,7 @@ else
   front_image="$IMAGE_PREFIX/${FRONT_IMAGE_NAME}-${PROFILE}:latest";
 fi
 
-ARCH="$docker_arch" FRONT_IMAGE="$front_image" PREFIX="${IMAGE_PREFIX}" PROFILE="${PROFILE}" docker-compose -f docker-compose.mock.yml down
+ARCH="$docker_arch" FRONT_IMAGE="$front_image" PREFIX="${IMAGE_PREFIX}" PROFILE="${PROFILE}" $DOCKER_COMPOSE -f docker-compose.mock.yml down
 
 docker_containers="$(docker ps -a -q)"
 docker_images="$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'niffler')"
@@ -48,5 +50,5 @@ bash ./docker-build.sh ${PROFILE}
 cd ../ || exit
 docker pull selenoid/vnc_chrome:117.0
 docker images
-ARCH="$docker_arch" FRONT_IMAGE="$front_image" PREFIX="${IMAGE_PREFIX}" PROFILE="${PROFILE}" docker-compose -f docker-compose.mock.yml up -d
+ARCH="$docker_arch" FRONT_IMAGE="$front_image" PREFIX="${IMAGE_PREFIX}" PROFILE="${PROFILE}" $DOCKER_COMPOSE -f docker-compose.mock.yml up -d
 docker ps -a

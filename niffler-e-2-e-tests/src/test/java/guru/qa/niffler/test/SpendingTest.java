@@ -16,20 +16,22 @@ import static com.codeborne.selenide.Selenide.$;
 public class SpendingTest {
 
   static {
-    Configuration.browserSize = "1980x1024";
+    Configuration.browserSize = "1920x1080";
+    Configuration.headless = false;
+    Configuration.pageLoadStrategy = "eager";
   }
 
   @BeforeEach
   void doLogin() {
     Selenide.open("http://127.0.0.1:3000/main");
     $("a[href*='redirect']").click();
-    $("input[name='username']").setValue("duck");
+    $("input[name='username']").setValue("Pizzly");
     $("input[name='password']").setValue("12345");
     $("button[type='submit']").click();
   }
 
   @GenerateSpend(
-      username = "duck",
+      username = "Pizzly",
       description = "QA.GURU Advanced 4",
       amount = 72500.00,
       category = "Обучение",

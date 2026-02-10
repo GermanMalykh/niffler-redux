@@ -1,6 +1,14 @@
 #!/bin/bash
+# Чтобы Gradle/Jib находили docker (демон Gradle мог стартовать из IDE с другим PATH)
+export PATH="/usr/local/bin:/opt/homebrew/bin:/Applications/Docker.app/Contents/Resources/bin:$PATH"
 source ./docker.properties
 export PROFILE="${PROFILE:=docker}"
+
+# Останавливаем демон Gradle — при следующем запуске он подхватит PATH из этого скрипта (и найдёт docker)
+./gradlew --stop 2>/dev/null || true
+
+# docker compose (пробел) — актуальная команда в Docker Desktop вместо docker-compose
+DOCKER_COMPOSE="docker compose"
 
 echo '### Java version ###'
 java --version
@@ -15,7 +23,7 @@ else
   front_image="${IMAGE_PREFIX}/${FRONT_IMAGE_NAME}-${PROFILE}:latest";
 fi
 
-FRONT_IMAGE="$front_image" PREFIX="${IMAGE_PREFIX}" PROFILE="${PROFILE}" docker-compose down
+FRONT_IMAGE="$front_image" PREFIX="${IMAGE_PREFIX}" PROFILE="${PROFILE}" $DOCKER_COMPOSE down
 
 docker_containers="$(docker ps -a -q)"
 docker_images="$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'niffler')"
@@ -44,5 +52,5 @@ fi
 
 cd ../
 docker images
-FRONT_IMAGE="$front_image" PREFIX="${IMAGE_PREFIX}" PROFILE="${PROFILE}" docker-compose up -d
+FRONT_IMAGE="$front_image" PREFIX="${IMAGE_PREFIX}" PROFILE="${PROFILE}" $DOCKER_COMPOSE up -d
 docker ps -a
