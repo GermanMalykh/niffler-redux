@@ -13,13 +13,13 @@ import java.lang.annotation.Target;
 @ExtendWith(SpendExtension.class)
 public @interface GenerateSpend {
 
-  String username();
+    String username();
 
-  String description();
+    String description();
 
-  String category();
+    String category();
 
-  double amount();
+    double amount();
 
-  CurrencyValues currency();
+    CurrencyValues currency();
 }

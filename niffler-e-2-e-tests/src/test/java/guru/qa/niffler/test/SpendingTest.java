@@ -17,43 +17,43 @@ import static com.codeborne.selenide.Selenide.$;
 
 public class SpendingTest {
 
-  static {
-    Configuration.browserSize = "1920x1080";
-    Configuration.headless = false;
-    Configuration.pageLoadStrategy = "eager";
-  }
+    static {
+        Configuration.browserSize = "1920x1080";
+        Configuration.headless = false;
+        Configuration.pageLoadStrategy = "eager";
+    }
 
-  @BeforeEach
-  void doLogin() {
-    Selenide.open("http://127.0.0.1:3000/main");
-    $("a[href*='redirect']").click();
-    $("input[name='username']").setValue("Pizzly");
-    $("input[name='password']").setValue("12345");
-    $("button[type='submit']").click();
-  }
+    @BeforeEach
+    void doLogin() {
+        Selenide.open("http://127.0.0.1:3000/main");
+        $("a[href*='redirect']").click();
+        $("input[name='username']").setValue("Pizzly");
+        $("input[name='password']").setValue("12345");
+        $("button[type='submit']").click();
+    }
 
-  @GenerateSpend(
-      username = "Pizzly",
-      description = "QA.GURU Advanced 4",
-      amount = 72500.00,
-      category = "Обучение",
-      currency = CurrencyValues.RUB
-  )
-  @Test
-  void spendingShouldBeDeletedByButtonDeleteSpending(SpendJson spend) {
-    $(".spendings-table tbody")
-        .$$("tr")
-        .find(text(spend.description()))
-        .$$("td")
-        .first()
-        .scrollIntoView(instant().block(center))
-        .click();
+    @GenerateSpend(
+            username = "Pizzly",
+            description = "QA.GURU Advanced 4",
+            amount = 72500.00,
+            category = "Обучение",
+            currency = CurrencyValues.RUB
+    )
+    @Test
+    void spendingShouldBeDeletedByButtonDeleteSpending(SpendJson spend) {
+        $(".spendings-table tbody")
+                .$$("tr")
+                .find(text(spend.description()))
+                .$$("td")
+                .first()
+                .scrollIntoView(instant().block(center))
+                .click();
 
-    $(byText("Delete selected"))
-        .click();
+        $(byText("Delete selected"))
+                .click();
 
-    $(".spendings-table tbody")
-        .$$("tr")
-        .shouldHave(size(0));
-  }
+        $(".spendings-table tbody")
+                .$$("tr")
+                .shouldHave(size(0));
+    }
 }
