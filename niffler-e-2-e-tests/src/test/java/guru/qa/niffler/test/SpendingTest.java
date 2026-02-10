@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import static com.codeborne.selenide.CollectionCondition.size;
 import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.ScrollIntoViewOptions.*;
+import static com.codeborne.selenide.ScrollIntoViewOptions.Block.*;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 
@@ -44,6 +46,7 @@ public class SpendingTest {
         .find(text(spend.description()))
         .$$("td")
         .first()
+        .scrollIntoView(instant().block(center))
         .click();
 
     $(byText("Delete selected"))
