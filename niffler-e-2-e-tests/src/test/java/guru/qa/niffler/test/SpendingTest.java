@@ -1,37 +1,20 @@
 package guru.qa.niffler.test;
 
-import com.codeborne.selenide.Configuration;
-import com.codeborne.selenide.Selenide;
-import guru.qa.niffler.jupiter.GenerateSpend;
+import guru.qa.niffler.jupiter.annotation.GenerateCategory;
+import guru.qa.niffler.jupiter.annotation.GenerateSpend;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
-import org.junit.jupiter.api.BeforeEach;
+import guru.qa.niffler.ui.pages.AuthPage;
+import guru.qa.niffler.ui.pages.MainPage;
 import org.junit.jupiter.api.Test;
 
-import static com.codeborne.selenide.CollectionCondition.size;
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.ScrollIntoViewOptions.*;
-import static com.codeborne.selenide.ScrollIntoViewOptions.Block.*;
-import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selenide.$;
+public class SpendingTest extends BaseUiTest {
+    MainPage main = new MainPage();
 
-public class SpendingTest {
-
-    static {
-        Configuration.browserSize = "1920x1080";
-        Configuration.headless = false;
-        Configuration.pageLoadStrategy = "eager";
-    }
-
-    @BeforeEach
-    void doLogin() {
-        Selenide.open("http://127.0.0.1:3000/main");
-        $("a[href*='redirect']").click();
-        $("input[name='username']").setValue("Pizzly");
-        $("input[name='password']").setValue("12345");
-        $("button[type='submit']").click();
-    }
-
+    @GenerateCategory(
+            category = "Обучение",
+            username = "Pizzly"
+    )
     @GenerateSpend(
             username = "Pizzly",
             description = "QA.GURU Advanced 4",
@@ -41,19 +24,11 @@ public class SpendingTest {
     )
     @Test
     void spendingShouldBeDeletedByButtonDeleteSpending(SpendJson spend) {
-        $(".spendings-table tbody")
-                .$$("tr")
-                .find(text(spend.description()))
-                .$$("td")
-                .first()
-                .scrollIntoView(instant().block(center))
-                .click();
-
-        $(byText("Delete selected"))
-                .click();
-
-        $(".spendings-table tbody")
-                .$$("tr")
-                .shouldHave(size(0));
+        main.open().clickLoginButton()
+                .getPage(AuthPage.class)
+                .loginAs("Pizzly", "12345")
+                .getPage(MainPage.class)
+                .deleteSpending(spend.description())
+                .shouldHaveNoSpendings();
     }
 }
