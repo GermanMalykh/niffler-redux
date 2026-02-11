@@ -37,6 +37,7 @@ import org.springframework.security.web.PortResolverImpl;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.session.DisableEncodeUrlFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -80,6 +81,9 @@ public class NifflerAuthServiceConfig {
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
                                                                       LoginUrlAuthenticationEntryPoint entryPoint) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+        // Ограничиваем цепочку только эндпоинтами OAuth2/OIDC, чтобы /login, /styles/**, /images/** обрабатывала defaultSecurityFilterChain и статика отдавалась без редиректа на логин
+        RequestMatcher endpointsMatcher = http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).getEndpointsMatcher();
+        http.securityMatcher(endpointsMatcher);
         if (environment.acceptsProfiles(Profiles.of("local", "staging"))) {
             http.addFilterBefore(new SpecificRequestDumperFilter(
                     new RequestDumperFilter(),
