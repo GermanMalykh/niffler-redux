@@ -1,8 +1,8 @@
 package guru.qa.niffler.ui.tests;
 
-import guru.qa.niffler.jupiter.annotation.AllureIdParam;
-import guru.qa.niffler.jupiter.extension.SpendJsonConverter;
-import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.api.model.SpendJson;
+import guru.qa.niffler.common.jupiter.annotation.AllureIdParam;
+import guru.qa.niffler.common.jupiter.extension.SpendJsonConverter;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ConvertWith;

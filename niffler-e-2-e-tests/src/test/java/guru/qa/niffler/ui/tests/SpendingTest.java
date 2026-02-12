@@ -1,9 +1,9 @@
 package guru.qa.niffler.ui.tests;
 
-import guru.qa.niffler.jupiter.annotation.GenerateCategory;
-import guru.qa.niffler.jupiter.annotation.GenerateSpend;
-import guru.qa.niffler.model.CurrencyValues;
-import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.api.model.CurrencyValues;
+import guru.qa.niffler.api.model.SpendJson;
+import guru.qa.niffler.common.jupiter.annotation.GenerateCategory;
+import guru.qa.niffler.common.jupiter.annotation.GenerateSpend;
 import guru.qa.niffler.ui.pages.AuthPage;
 import guru.qa.niffler.ui.pages.MainPage;
 import org.junit.jupiter.api.Test;

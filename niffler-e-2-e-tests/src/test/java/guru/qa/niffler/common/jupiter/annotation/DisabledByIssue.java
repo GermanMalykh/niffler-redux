@@ -1,6 +1,6 @@
 package guru.qa.niffler.common.jupiter.annotation;
 
-import guru.qa.niffler.jupiter.extension.IssueExtension;
+import guru.qa.niffler.common.jupiter.extension.IssueExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.annotation.ElementType;

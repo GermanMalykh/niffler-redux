@@ -1,8 +1,9 @@
 package guru.qa.niffler.common.jupiter.extension;
 
 import guru.qa.niffler.api.clients.CategoryApi;
-import guru.qa.niffler.jupiter.annotation.GenerateCategory;
-import guru.qa.niffler.model.CategoryJson;
+
+import guru.qa.niffler.api.model.CategoryJson;
+import guru.qa.niffler.common.jupiter.annotation.GenerateCategory;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;

@@ -2,7 +2,7 @@ package guru.qa.niffler.common.jupiter.extension;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import guru.qa.niffler.api.clients.GhApi;
-import guru.qa.niffler.jupiter.annotation.DisabledByIssue;
+import guru.qa.niffler.common.jupiter.annotation.DisabledByIssue;
 import lombok.SneakyThrows;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;

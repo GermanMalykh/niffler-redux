@@ -1,8 +1,9 @@
 package guru.qa.niffler.common.jupiter.extension;
 
 import guru.qa.niffler.api.clients.SpendApi;
-import guru.qa.niffler.jupiter.annotation.GenerateSpend;
-import guru.qa.niffler.model.SpendJson;
+
+import guru.qa.niffler.api.model.SpendJson;
+import guru.qa.niffler.common.jupiter.annotation.GenerateSpend;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
