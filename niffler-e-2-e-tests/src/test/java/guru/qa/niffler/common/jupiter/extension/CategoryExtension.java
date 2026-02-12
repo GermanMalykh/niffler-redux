@@ -1,8 +1,9 @@
-package guru.qa.niffler.jupiter.extension;
+package guru.qa.niffler.common.jupiter.extension;
 
-import guru.qa.niffler.api.SpendApi;
-import guru.qa.niffler.jupiter.annotation.GenerateSpend;
-import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.api.clients.CategoryApi;
+
+import guru.qa.niffler.api.model.CategoryJson;
+import guru.qa.niffler.common.jupiter.annotation.GenerateCategory;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -13,13 +14,12 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-import java.util.Date;
 import java.util.Optional;
 
-public class SpendExtension implements BeforeEachCallback, ParameterResolver {
+public class CategoryExtension implements BeforeEachCallback, ParameterResolver {
 
     public static final ExtensionContext.Namespace NAMESPACE
-            = ExtensionContext.Namespace.create(SpendExtension.class);
+            = ExtensionContext.Namespace.create(CategoryExtension.class);
 
     private static final OkHttpClient httpClient = new OkHttpClient.Builder().build();
     private static final Retrofit retrofit = new Retrofit.Builder()
@@ -28,30 +28,26 @@ public class SpendExtension implements BeforeEachCallback, ParameterResolver {
             .addConverterFactory(JacksonConverterFactory.create())
             .build();
 
-    private final SpendApi spendApi = retrofit.create(SpendApi.class);
+    private final CategoryApi categoryApi = retrofit.create(CategoryApi.class);
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
-        Optional<GenerateSpend> spend = AnnotationSupport.findAnnotation(
+        Optional<GenerateCategory> category = AnnotationSupport.findAnnotation(
                 extensionContext.getRequiredTestMethod(),
-                GenerateSpend.class
+                GenerateCategory.class
         );
 
-        if (spend.isPresent()) {
-            GenerateSpend spendData = spend.get();
-            SpendJson spendJson = new SpendJson(
+        if (category.isPresent()) {
+            GenerateCategory categoryData = category.get();
+            CategoryJson categoryJson = new CategoryJson(
                     null,
-                    new Date(),
-                    spendData.category(),
-                    spendData.currency(),
-                    spendData.amount(),
-                    spendData.description(),
-                    spendData.username()
+                    categoryData.category(),
+                    categoryData.username()
             );
 
-            SpendJson created = spendApi.addSpend(spendJson).execute().body();
+            CategoryJson created = categoryApi.addCategory(categoryJson).execute().body();
             extensionContext.getStore(NAMESPACE)
-                    .put("spend", created);
+                    .put("category", created);
         }
     }
 
@@ -59,12 +55,13 @@ public class SpendExtension implements BeforeEachCallback, ParameterResolver {
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return parameterContext.getParameter()
                 .getType()
-                .isAssignableFrom(SpendJson.class);
+                .isAssignableFrom(CategoryJson.class);
     }
 
     @Override
-    public SpendJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return extensionContext.getStore(NAMESPACE)
-                .get("spend", SpendJson.class);
+                .get("category", CategoryJson.class);
     }
+
 }
