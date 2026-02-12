@@ -27,6 +27,7 @@ public class SpendingsTable {
                 .click();
     }
 
+    @Step("Check that spendings table is empty")
     public void shouldBeEmpty() {
         rows().shouldHave(size(0));
     }

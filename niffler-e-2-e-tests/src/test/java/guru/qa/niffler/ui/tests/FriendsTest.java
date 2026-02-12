@@ -1,42 +1,53 @@
 package guru.qa.niffler.ui.tests;
 
-import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.api.model.UserJson;
 import guru.qa.niffler.common.jupiter.annotation.User;
 import guru.qa.niffler.common.jupiter.extension.UsersQueueExtension;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import guru.qa.niffler.ui.pages.AuthPage;
+import guru.qa.niffler.ui.pages.FriendsPage;
+import guru.qa.niffler.ui.pages.MainPage;
+import guru.qa.niffler.ui.pages.PeoplePage;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static com.codeborne.selenide.Selenide.$;
-import static guru.qa.niffler.common.jupiter.annotation.User.UserType.WITH_FRIENDS;
+import static guru.qa.niffler.common.jupiter.annotation.User.UserType.*;
+import static io.qameta.allure.Allure.step;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled
 @ExtendWith(UsersQueueExtension.class)
-public class FriendsTest {
+public class FriendsTest extends BaseUiTest {
+    MainPage main = new MainPage();
 
-  @BeforeEach
-  void doLogin(@User(WITH_FRIENDS) UserJson user) {
-    Selenide.open("http://127.0.0.1:3000/main");
-    $("a[href*='redirect']").click();
-    $("input[name='username']").setValue(user.username());
-    $("input[name='password']").setValue(user.testData().password());
-    $("button[type='submit']").click();
-  }
+    @Test
+    @DisplayName("Display confirmed friends")
+    void shouldDisplayConfirmedFriends(@User(WITH_FRIENDS) UserJson user) {
+        loginAs(user);
+        FriendsPage friendsPage = main.getPage(FriendsPage.class).open();
+        assertTrue(friendsPage.hasConfirmedFriendship(), "Friendship should be confirmed");
+    }
 
-  @Test
-  void friendsTableShouldNotBeEmpty0(@User(WITH_FRIENDS) UserJson user) throws Exception {
-    Thread.sleep(3000);
-  }
+    @Test
+    @DisplayName("Display incoming invitation")
+    void shouldDisplayIncomingInvitation(@User(INCOMING_INVITE) UserJson user) {
+        loginAs(user);
+        FriendsPage friendsPage = main.getPage(FriendsPage.class).open();
+        assertTrue(friendsPage.hasIncomingInvitation(), "Incoming invitation should be displayed");
+    }
 
-  @Test
-  void friendsTableShouldNotBeEmpty1(@User(WITH_FRIENDS) UserJson user) throws Exception {
-    Thread.sleep(3000);
-  }
+    @Test
+    @DisplayName("Display pending invitation")
+    void shouldDisplayPendingInvitation(@User(PENDING) UserJson user) {
+        loginAs(user);
+        PeoplePage peoplePage = main.getPage(PeoplePage.class).open();
+        assertTrue(peoplePage.hasPendingInvitation(), "Pending invitation should be displayed");
+    }
 
-  @Test
-  void friendsTableShouldNotBeEmpty2(@User(WITH_FRIENDS) UserJson user) throws Exception {
-    Thread.sleep(3000);
-  }
+    private void loginAs(UserJson user) {
+        step("User login system", () -> main.open().clickLoginButton()
+                .getPage(AuthPage.class)
+                .loginAs(user.username(), user.testData().password())
+                .clickLoginButton());
+    }
+
 }
