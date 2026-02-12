@@ -22,32 +22,40 @@ public class FriendsTest extends BaseUiTest {
     @Test
     @DisplayName("Display confirmed friends")
     void shouldDisplayConfirmedFriends(@User(WITH_FRIENDS) UserJson user) {
-        loginAs(user);
-        FriendsPage friendsPage = main.getPage(FriendsPage.class).open();
-        assertTrue(friendsPage.hasConfirmedFriendship(), "Friendship should be confirmed");
+        step("Login as " + user.username(), () -> main.open().clickLoginButton()
+                .getPage(AuthPage.class)
+                .loginAs(user.username(), user.testData().password())
+                .clickLoginButton());
+        FriendsPage friendsPage = main.getPage(FriendsPage.class);
+        step("Open Friends page", friendsPage::open);
+        step("Verify friendship is confirmed", () ->
+                assertTrue(friendsPage.hasConfirmedFriendship(), "Friendship should be confirmed"));
     }
 
     @Test
     @DisplayName("Display incoming invitation")
     void shouldDisplayIncomingInvitation(@User(INCOMING_INVITE) UserJson user) {
-        loginAs(user);
-        FriendsPage friendsPage = main.getPage(FriendsPage.class).open();
-        assertTrue(friendsPage.hasIncomingInvitation(), "Incoming invitation should be displayed");
+        step("Login as " + user.username(), () -> main.open().clickLoginButton()
+                .getPage(AuthPage.class)
+                .loginAs(user.username(), user.testData().password())
+                .clickLoginButton());
+        FriendsPage friendsPage = main.getPage(FriendsPage.class);
+        step("Open Friends page", friendsPage::open);
+        step("Verify incoming invitation is displayed", () ->
+                assertTrue(friendsPage.hasIncomingInvitation(), "Incoming invitation should be displayed"));
     }
 
     @Test
     @DisplayName("Display pending invitation")
     void shouldDisplayPendingInvitation(@User(PENDING) UserJson user) {
-        loginAs(user);
-        PeoplePage peoplePage = main.getPage(PeoplePage.class).open();
-        assertTrue(peoplePage.hasPendingInvitation(), "Pending invitation should be displayed");
-    }
-
-    private void loginAs(UserJson user) {
-        step("User login system", () -> main.open().clickLoginButton()
+        step("Login as " + user.username(), () -> main.open().clickLoginButton()
                 .getPage(AuthPage.class)
                 .loginAs(user.username(), user.testData().password())
                 .clickLoginButton());
+        PeoplePage peoplePage = main.getPage(PeoplePage.class);
+        step("Open People page", peoplePage::open);
+        step("Verify pending invitation is displayed", () ->
+                assertTrue(peoplePage.hasPendingInvitation(), "Pending invitation should be displayed"));
     }
 
 }

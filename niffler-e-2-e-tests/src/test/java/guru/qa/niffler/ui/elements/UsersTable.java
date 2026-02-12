@@ -37,27 +37,26 @@ public class UsersTable {
         return this;
     }
 
-    @Step("Check that friendship is confirmed")
+    @Step("Find row 'You are friends' in table")
     public boolean hasConfirmedFriendship() {
         waitForTable();
         return rows().stream().anyMatch(row -> row.getText().contains(FRIEND_CONFIRMATION_TEXT));
     }
 
-    @Step("Check that incoming invitation is displayed")
+    @Step("Find submit-invitation button in table")
     public boolean hasIncomingInvitation() {
         waitForTable();
-        TABLE.$("[data-tooltip-id='submit-invitation']").should(visible);
         return TABLE.$("[data-tooltip-id='submit-invitation']").exists();
     }
 
-    @Step("Check that pending invitation is displayed")
+    @Step("Find row 'Pending invitation' in table")
     public boolean hasPendingInvitation() {
         waitForTable();
         return rows().stream().anyMatch(row -> row.getText().contains("Pending invitation"));
     }
 
     private void waitForTable() {
-        TABLE.should(exist);
+        TABLE.shouldBe(visible).should(exist);
     }
 
     @Step("Check that users table is empty")
