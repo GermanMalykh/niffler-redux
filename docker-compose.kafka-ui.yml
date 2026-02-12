@@ -1,0 +1,18 @@
+# Kafka UI — для работы должен быть запущен Kafka (bash localenv.sh)
+# В Kafka UI: Bootstrap Servers = kafka:29092 (оба в сети niffler-net)
+# UI доступен: http://localhost:8080
+services:
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: niffler
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    networks:
+      - niffler-net
+
+networks:
+  niffler-net:
+    external: true

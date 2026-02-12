@@ -131,6 +131,22 @@ docker run --name=kafka -e KAFKA_BROKER_ID=1 -e KAFKA_ZOOKEEPER_CONNECT=$(docker
 
 https://github.com/confluentinc/cp-docker-images/issues/801#issuecomment-692085103
 
+#### 4.1 Kafka UI (опционально)
+
+Если Kafka и Kafka UI оба в Docker, для подключения используйте **Bootstrap Servers: `kafka:29092`** (имя контейнера и внутренний порт Docker-сети).
+
+Запуск Kafka UI (после `bash localenv.sh`):
+
+```posh
+docker compose -f docker-compose.kafka-ui.yml up -d
+```
+
+UI доступен по адресу: http://localhost:8080
+
+В форме подключения Kafka UI:
+- **Cluster name:** niffler (или любое ≥3 символов)
+- **Bootstrap Servers:** host `kafka`, port `29092` (или одна строка `kafka:29092`)
+
 #### 5. Установить одну из программ для визуальной работы с Postgres
 
 Например, DBeaver или Datagrip. Мы рекомендуем бесплатную PgAdmin 4.
