@@ -123,7 +123,7 @@ dependencies {
     // WEB
     testImplementation "com.codeborne:selenide:${selenideVersion}"
     // Utils
-    testImplementation 'com.github.javafaker:javafaker:1.0.2'
+    testImplementation 'net.datafaker:datafaker:2.5.4'
     testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
     testImplementation 'com.github.vertical-blank:sql-formatter:2.0.3'
