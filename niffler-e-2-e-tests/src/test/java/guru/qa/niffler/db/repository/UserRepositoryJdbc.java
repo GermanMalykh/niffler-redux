@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class UserRepositoryJdbc implements UserRepository {
@@ -116,7 +117,7 @@ public class UserRepositoryJdbc implements UserRepository {
     }
 
     @Override
-    public UserAuthEntity findInAuthByUsername(String username) {
+    public Optional<UserAuthEntity> findInAuthByUsername(String username) {
         UserAuthEntity userAuth = new UserAuthEntity();
         try (Connection conn = authDs.getConnection()) {
             conn.setAutoCommit(false);
@@ -126,7 +127,7 @@ public class UserRepositoryJdbc implements UserRepository {
                     userPs.setString(1, username);
                     ResultSet rs = userPs.executeQuery();
                     if (!rs.next()) {
-                        return null;
+                        return Optional.empty();
                     }
                     userAuth.setId(rs.getObject("id", UUID.class));
                     userAuth.setUsername(rs.getString("username"));
@@ -158,11 +159,11 @@ public class UserRepositoryJdbc implements UserRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return userAuth;
+        return Optional.of(userAuth);
     }
 
     @Override
-    public UserEntity findInUserdataByUsername(String username) {
+    public Optional<UserEntity> findInUserdataByUsername(String username) {
         UserEntity user = new UserEntity();
         try (Connection conn = udDs.getConnection()) {
             conn.setAutoCommit(false);
@@ -172,7 +173,7 @@ public class UserRepositoryJdbc implements UserRepository {
                     userPs.setString(1, username);
                     ResultSet rs = userPs.executeQuery();
                     if (!rs.next()) {
-                        return null;
+                        return Optional.empty();
                     }
                     user.setId(rs.getObject("id", UUID.class));
                     user.setUsername(rs.getString("username"));
@@ -191,7 +192,7 @@ public class UserRepositoryJdbc implements UserRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return user;
+        return Optional.of(user);
     }
 
     @Override
