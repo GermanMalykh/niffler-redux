@@ -15,8 +15,6 @@ public interface UserRepository {
 
     UserEntity findInUserdataByUsername(String username);
 
-    UserAuthEntity updateInAuth(UserAuthEntity user);
-
     UserEntity updateInUserdata(UserEntity user);
 
     void deleteInAuthById(UUID id);

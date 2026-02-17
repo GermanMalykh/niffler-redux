@@ -3,6 +3,8 @@ package guru.qa.niffler.db.repository;
 import guru.qa.niffler.db.DataSourceProvider;
 import guru.qa.niffler.db.JdbcUrl;
 import guru.qa.niffler.db.model.Authority;
+import guru.qa.niffler.db.model.AuthorityEntity;
+import guru.qa.niffler.db.model.CurrencyValues;
 import guru.qa.niffler.db.model.UserAuthEntity;
 import guru.qa.niffler.db.model.UserEntity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -115,22 +117,111 @@ public class UserRepositoryJdbc implements UserRepository {
 
     @Override
     public UserAuthEntity findInAuthByUsername(String username) {
-        return null;
+        UserAuthEntity userAuth = new UserAuthEntity();
+        try (Connection conn = authDs.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement userPs = conn.prepareStatement(
+                        "SELECT * FROM \"user\" WHERE username = ?")) {
+                    userPs.setString(1, username);
+                    ResultSet rs = userPs.executeQuery();
+                    if (!rs.next()) {
+                        return null;
+                    }
+                    userAuth.setId(rs.getObject("id", UUID.class));
+                    userAuth.setUsername(rs.getString("username"));
+                    userAuth.setPassword(rs.getString("password"));
+                    userAuth.setEnabled(rs.getBoolean("enabled"));
+                    userAuth.setAccountNonExpired(rs.getBoolean("account_non_expired"));
+                    userAuth.setAccountNonLocked(rs.getBoolean("account_non_locked"));
+                    userAuth.setCredentialsNonExpired(rs.getBoolean("credentials_non_expired"));
+                }
+                try (PreparedStatement authorityPs = conn.prepareStatement(
+                        "SELECT id, authority FROM \"authority\" WHERE user_id = ?")) {
+                    authorityPs.setObject(1, userAuth.getId());
+                    try (ResultSet authRs = authorityPs.executeQuery()) {
+                        while (authRs.next()) {
+                            AuthorityEntity ae = new AuthorityEntity();
+                            ae.setId(authRs.getObject("id", UUID.class));
+                            ae.setAuthority(Authority.valueOf(authRs.getString("authority")));
+                            userAuth.getAuthorities().add(ae);
+                        }
+                    }
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new RuntimeException(e);
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return userAuth;
     }
 
     @Override
     public UserEntity findInUserdataByUsername(String username) {
-        return null;
-    }
-
-    @Override
-    public UserAuthEntity updateInAuth(UserAuthEntity user) {
-        return null;
+        UserEntity user = new UserEntity();
+        try (Connection conn = udDs.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement userPs = conn.prepareStatement(
+                        "SELECT * FROM \"user\" WHERE username = ?")) {
+                    userPs.setString(1, username);
+                    ResultSet rs = userPs.executeQuery();
+                    if (!rs.next()) {
+                        return null;
+                    }
+                    user.setId(rs.getObject("id", UUID.class));
+                    user.setUsername(rs.getString("username"));
+                    user.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
+                    user.setFirstname(rs.getString("firstname"));
+                    user.setSurname(rs.getString("surname"));
+                    user.setPhoto(rs.getBytes("photo"));
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new RuntimeException(e);
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
     }
 
     @Override
     public UserEntity updateInUserdata(UserEntity user) {
-        return null;
+        try (Connection conn = udDs.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement userPs = conn.prepareStatement(
+                        "UPDATE \"user\" SET " +
+                                "username = ?, currency = ?, firstname = ?, surname = ?, photo = ? WHERE id = ?")) {
+                    userPs.setString(1, user.getUsername());
+                    userPs.setString(2, user.getCurrency().name());
+                    userPs.setString(3, user.getFirstname());
+                    userPs.setString(4, user.getSurname());
+                    userPs.setObject(5, user.getPhoto());
+                    userPs.setObject(6, user.getId());
+
+                    userPs.executeUpdate();
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new RuntimeException(e);
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
     }
 
     @Override
