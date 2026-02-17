@@ -1,69 +1,35 @@
 package guru.qa.niffler.ui.tests;
 
-import com.codeborne.selenide.Selenide;
-import guru.qa.niffler.db.model.Authority;
-import guru.qa.niffler.db.model.AuthorityEntity;
-import guru.qa.niffler.db.model.CurrencyValues;
+import guru.qa.niffler.common.jupiter.annotation.DbUser;
+
 import guru.qa.niffler.db.model.UserAuthEntity;
-import guru.qa.niffler.db.model.UserEntity;
-import guru.qa.niffler.db.repository.UserRepository;
-import guru.qa.niffler.common.jupiter.extension.UserRepositoryExtension;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import guru.qa.niffler.ui.pages.AuthPage;
+import guru.qa.niffler.ui.pages.MainPage;
+
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.Arrays;
+public class LoginTest extends BaseUiTest {
+    MainPage main = new MainPage();
 
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$;
-
-@ExtendWith(UserRepositoryExtension.class)
-public class LoginTest extends BaseWebTest {
-
-    private UserRepository userRepository;
-
-    private UserAuthEntity userAuth;
-    private UserEntity user;
-
-
-    @BeforeEach
-    void createUser() {
-        userAuth = new UserAuthEntity();
-        userAuth.setUsername("valentin_1");
-        userAuth.setPassword("12345");
-        userAuth.setEnabled(true);
-        userAuth.setAccountNonExpired(true);
-        userAuth.setAccountNonLocked(true);
-        userAuth.setCredentialsNonExpired(true);
-        userAuth.setAuthorities(Arrays.stream(Authority.values())
-                .map(e -> {
-                    AuthorityEntity ae = new AuthorityEntity();
-                    ae.setAuthority(e);
-                    return ae;
-                }).toList()
-        );
-
-        user = new UserEntity();
-        user.setUsername("valentin_1");
-        user.setCurrency(CurrencyValues.RUB);
-        userRepository.createInAuth(userAuth);
-        userRepository.createInUserdata(user);
-    }
-
-    @AfterEach
-    void removeUser() {
-        userRepository.deleteInAuthById(userAuth.getId());
-        userRepository.deleteInUserdataById(user.getId());
+    @Test
+    @DbUser(username = "valentin22", password = "pass22")
+    void statisticShouldBeVisibleAfterLoginWithSpecifiedUser(UserAuthEntity userAuth) {
+        main.open()
+                .clickLoginButton()
+                .getPage(AuthPage.class)
+                .loginAs(userAuth.getUsername(), userAuth.getPassword())
+                .getPage(MainPage.class)
+                .shouldHaveSectionStats();
     }
 
     @Test
-    void statisticShouldBeVisibleAfterLogin() {
-        Selenide.open("http://127.0.0.1:3000/main");
-        $("a[href*='redirect']").click();
-        $("input[name='username']").setValue(userAuth.getUsername());
-        $("input[name='password']").setValue(userAuth.getPassword());
-        $("button[type='submit']").click();
-        $(".main-content__section-stats").should(visible);
+    @DbUser()
+    void statisticShouldBeVisibleAfterLoginWithRandomUser(UserAuthEntity userAuth) {
+        main.open()
+                .clickLoginButton()
+                .getPage(AuthPage.class)
+                .loginAs(userAuth.getUsername(), userAuth.getPassword())
+                .getPage(MainPage.class)
+                .shouldHaveSectionStats();
     }
 }

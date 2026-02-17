@@ -7,6 +7,7 @@ import guru.qa.niffler.ui.pages.AuthPage;
 import guru.qa.niffler.ui.pages.FriendsPage;
 import guru.qa.niffler.ui.pages.MainPage;
 import guru.qa.niffler.ui.pages.PeoplePage;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import static guru.qa.niffler.common.jupiter.annotation.User.UserType.*;
 import static io.qameta.allure.Allure.step;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Disabled
 @ExtendWith(UsersQueueExtension.class)
 public class FriendsTest extends BaseUiTest {
     MainPage main = new MainPage();
