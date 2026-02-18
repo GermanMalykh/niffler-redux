@@ -51,7 +51,8 @@ public class UserRepositorySJdbc implements UserRepository {
             authTemplate.update(con -> {
                 PreparedStatement ps = con.prepareStatement(
                         "INSERT INTO \"user\" " +
-                                "(username, password, enabled, account_non_expired, account_non_locked, credentials_non_expired) " +
+                                "(username, password, enabled, " +
+                                "account_non_expired, account_non_locked, credentials_non_expired) " +
                                 "VALUES (?, ?, ?, ?, ?, ?)",
                         PreparedStatement.RETURN_GENERATED_KEYS
                 );
@@ -136,12 +137,12 @@ public class UserRepositorySJdbc implements UserRepository {
     }
 
     @Override
-    public UserAuthEntity updateInAuth(UserAuthEntity user) {
+    public UserAuthEntity updateUserInAuth(UserAuthEntity user) {
         return null;
     }
 
     @Override
-    public UserEntity updateInUserdata(UserEntity user) {
+    public UserEntity updateUserInUserdata(UserEntity user) {
         return null;
     }
 

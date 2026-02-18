@@ -8,6 +8,7 @@ import guru.qa.niffler.db.model.UserAuthEntity;
 import guru.qa.niffler.db.model.UserEntity;
 import guru.qa.niffler.db.repository.UserRepository;
 import guru.qa.niffler.db.repository.UserRepositoryJdbc;
+import guru.qa.niffler.db.repository.UserRepositorySJdbc;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -22,7 +23,10 @@ import java.util.Arrays;
 
 public class DbUserExtension implements Extension, BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(DbUserExtension.class);
-    private UserRepository userRepository = new UserRepositoryJdbc();
+    private String repository = System.getProperty("repository", "jdbc");
+    private UserRepository userRepository = "sjdbc".equals(repository)
+            ? new UserRepositorySJdbc()
+            : new UserRepositoryJdbc();
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
