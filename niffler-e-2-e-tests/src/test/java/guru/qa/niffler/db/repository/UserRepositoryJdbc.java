@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class UserRepositoryJdbc implements UserRepository {
@@ -116,17 +117,17 @@ public class UserRepositoryJdbc implements UserRepository {
     }
 
     @Override
-    public UserAuthEntity findInAuthByUsername(String username) {
+    public Optional<UserAuthEntity> findByIdInAuth(UUID id) {
         UserAuthEntity userAuth = new UserAuthEntity();
         try (Connection conn = authDs.getConnection()) {
             conn.setAutoCommit(false);
             try {
                 try (PreparedStatement userPs = conn.prepareStatement(
-                        "SELECT * FROM \"user\" WHERE username = ?")) {
-                    userPs.setString(1, username);
+                        "SELECT * FROM \"user\" WHERE id = ?")) {
+                    userPs.setObject(1, id);
                     ResultSet rs = userPs.executeQuery();
                     if (!rs.next()) {
-                        return null;
+                        return Optional.empty();
                     }
                     userAuth.setId(rs.getObject("id", UUID.class));
                     userAuth.setUsername(rs.getString("username"));
@@ -158,21 +159,21 @@ public class UserRepositoryJdbc implements UserRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return userAuth;
+        return Optional.of(userAuth);
     }
 
     @Override
-    public UserEntity findInUserdataByUsername(String username) {
+    public Optional<UserEntity> findByIdInUserdata(UUID id) {
         UserEntity user = new UserEntity();
         try (Connection conn = udDs.getConnection()) {
             conn.setAutoCommit(false);
             try {
                 try (PreparedStatement userPs = conn.prepareStatement(
-                        "SELECT * FROM \"user\" WHERE username = ?")) {
-                    userPs.setString(1, username);
+                        "SELECT * FROM \"user\" WHERE id = ?")) {
+                    userPs.setObject(1, id);
                     ResultSet rs = userPs.executeQuery();
                     if (!rs.next()) {
-                        return null;
+                        return Optional.empty();
                     }
                     user.setId(rs.getObject("id", UUID.class));
                     user.setUsername(rs.getString("username"));
@@ -191,11 +192,58 @@ public class UserRepositoryJdbc implements UserRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return Optional.of(user);
+    }
+
+    @Override
+    public UserAuthEntity updateUserInAuth(UserAuthEntity user) {
+        try (Connection conn = authDs.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement userPs = conn.prepareStatement(
+                        "UPDATE \"user\" SET username=?, password=?, enabled=?," +
+                                "account_non_expired=?, account_non_locked=?, credentials_non_expired=? WHERE id=?");
+                     PreparedStatement authorityDelPs = conn.prepareStatement(
+                             "DELETE FROM \"authority\" WHERE user_id=?")) {
+                    userPs.setString(1, user.getUsername());
+                    userPs.setString(2, pe.encode(user.getPassword()));
+                    userPs.setBoolean(3, user.getEnabled());
+                    userPs.setBoolean(4, user.getAccountNonExpired());
+                    userPs.setBoolean(5, user.getAccountNonLocked());
+                    userPs.setBoolean(6, user.getCredentialsNonExpired());
+                    userPs.setObject(7, user.getId());
+                    userPs.executeUpdate();
+
+                    authorityDelPs.setObject(1, user.getId());
+                    authorityDelPs.executeUpdate();
+                }
+                try (PreparedStatement authorityInsPs = conn.prepareStatement(
+                        "INSERT INTO \"authority\" (user_id, authority) VALUES (?, ?)")) {
+                    if (user.getAuthorities() != null) {
+                        for (AuthorityEntity ae : user.getAuthorities()) {
+                            authorityInsPs.setObject(1, user.getId());
+                            authorityInsPs.setString(2, ae.getAuthority().name());
+                            authorityInsPs.addBatch();
+                            authorityInsPs.clearParameters();
+                        }
+                        authorityInsPs.executeBatch();
+                    }
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new RuntimeException(e);
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return user;
     }
 
     @Override
-    public UserEntity updateInUserdata(UserEntity user) {
+    public UserEntity updateUserInUserdata(UserEntity user) {
         try (Connection conn = udDs.getConnection()) {
             conn.setAutoCommit(false);
             try {
