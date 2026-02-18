@@ -117,14 +117,14 @@ public class UserRepositoryJdbc implements UserRepository {
     }
 
     @Override
-    public Optional<UserAuthEntity> findInAuthByUsername(String username) {
+    public Optional<UserAuthEntity> findByIdInAuth(UUID id) {
         UserAuthEntity userAuth = new UserAuthEntity();
         try (Connection conn = authDs.getConnection()) {
             conn.setAutoCommit(false);
             try {
                 try (PreparedStatement userPs = conn.prepareStatement(
-                        "SELECT * FROM \"user\" WHERE username = ?")) {
-                    userPs.setString(1, username);
+                        "SELECT * FROM \"user\" WHERE id = ?")) {
+                    userPs.setObject(1, id);
                     ResultSet rs = userPs.executeQuery();
                     if (!rs.next()) {
                         return Optional.empty();
@@ -163,14 +163,14 @@ public class UserRepositoryJdbc implements UserRepository {
     }
 
     @Override
-    public Optional<UserEntity> findInUserdataByUsername(String username) {
+    public Optional<UserEntity> findByIdInUserdata(UUID id) {
         UserEntity user = new UserEntity();
         try (Connection conn = udDs.getConnection()) {
             conn.setAutoCommit(false);
             try {
                 try (PreparedStatement userPs = conn.prepareStatement(
-                        "SELECT * FROM \"user\" WHERE username = ?")) {
-                    userPs.setString(1, username);
+                        "SELECT * FROM \"user\" WHERE id = ?")) {
+                    userPs.setObject(1, id);
                     ResultSet rs = userPs.executeQuery();
                     if (!rs.next()) {
                         return Optional.empty();
@@ -193,6 +193,11 @@ public class UserRepositoryJdbc implements UserRepository {
             throw new RuntimeException(e);
         }
         return Optional.of(user);
+    }
+
+    @Override
+    public UserAuthEntity updateInAuth(UserAuthEntity user) {
+        return null;
     }
 
     @Override

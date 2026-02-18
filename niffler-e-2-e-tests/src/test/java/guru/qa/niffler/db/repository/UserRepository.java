@@ -12,9 +12,11 @@ public interface UserRepository {
 
     UserEntity createInUserdata(UserEntity user);
 
-    Optional<UserAuthEntity> findInAuthByUsername(String username);
+    Optional<UserAuthEntity> findByIdInAuth(UUID id);
 
-    Optional<UserEntity> findInUserdataByUsername(String username);
+    Optional<UserEntity> findByIdInUserdata(UUID id);
+
+    UserAuthEntity updateInAuth(UserAuthEntity user);
 
     UserEntity updateInUserdata(UserEntity user);
 
