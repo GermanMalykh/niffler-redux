@@ -16,9 +16,9 @@ public interface UserRepository {
 
     Optional<UserEntity> findByIdInUserdata(UUID id);
 
-    UserAuthEntity updateInAuth(UserAuthEntity user);
+    UserAuthEntity updateUserInAuth(UserAuthEntity user);
 
-    UserEntity updateInUserdata(UserEntity user);
+    UserEntity updateUserInUserdata(UserEntity user);
 
     void deleteInAuthById(UUID id);
 
